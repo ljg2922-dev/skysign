@@ -48,7 +48,7 @@ function load(){
         return;
       }
       box.innerHTML = '<div class="grid">' + list.map(t => {
-        const link = signUrl + '?t=' + encodeURIComponent(t.id);
+        const link = signUrl + '?t=' + encodeURIComponent(t.id) + '&v=' + Date.now().toString(36); // v: 캐시 방지용
         const qr = 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=8&data=' + encodeURIComponent(link);
         return '<div class="item"><h2>' + esc(t.name) + '</h2>' +
           '<div class="meta">' + esc([t.date, t.place].filter(Boolean).join(' · ')) + '</div>' +
