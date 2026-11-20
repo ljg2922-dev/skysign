@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<base target="_top">
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>교직원 연수 등록부</title>
+<script src="config.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
   :root{
@@ -68,14 +70,14 @@
   @keyframes sp{to{transform:rotate(360deg)}}
 </style>
 </head>
-<body data-pre="<?= preselect ?>">
+<body>
 <header>
-  <div class="school"><?= school ?></div>
+  <div class="school" id="schoolName"></div>
   <h1>교직원 연수 등록부</h1>
 </header>
 
 <div class="wrap">
-  <div class="card training" id="trainingCard"></div>
+  <div class="card training" id="trainingCard"><div class="empty">연수 정보를 불러오는 중…</div></div>
 
   <form id="form" class="card" autocomplete="off" style="display:none">
     <div class="field">
@@ -129,8 +131,9 @@
 </div>
 
 <script>
-const TRAININGS = <?!= trainingsJson ?>;
-const PRESELECT = document.body.dataset.pre || '';
+const CFG = window.APP_CONFIG || {};
+let TRAININGS = [];
+const PRESELECT = new URLSearchParams(location.search).get('t') || '';
 const POSITIONS = ['교장','교감','수석교사','부장교사','교사','보건교사','영양교사','사서교사','전문상담교사','행정실장','주무관','교육공무직','기타'];
 
 const $ = (id) => document.getElementById(id);
@@ -279,8 +282,11 @@ $('form').addEventListener('submit', e => {
   btn.disabled = true; btn.innerHTML = '<span class="spin"></span>등록 중…';
   const done = () => { btn.disabled = false; btn.textContent = '등록하기'; };
 
-  google.script.run
-    .withSuccessHandler(res => {
+  const payload = { action:'submit', trainingId: current.id, position: pos, dept: dept, name: name, signature: exportSignature() };
+  // text/plain 으로 보내면 CORS 사전요청 없이 Apps Script로 바로 전달됩니다
+  fetch(CFG.API_URL, { method:'POST', body: JSON.stringify(payload) })
+    .then(r => r.json())
+    .then(res => {
       done();
       if (!res || !res.ok){ showErr((res && res.message) || '등록하지 못했어요.'); return; }
       store.set('regPos', pos); store.set('regDept', dept);
@@ -288,11 +294,7 @@ $('form').addEventListener('submit', e => {
       $('doneNo').textContent = '연번 ' + res.no + '번 · ' + res.time;
       $('done').classList.add('show');
     })
-    .withFailureHandler(err => {
-      done();
-      showErr((err && err.message) ? err.message.replace(/^Error:\s*/,'') : '네트워크 오류가 있어요. 다시 시도해 주세요.');
-    })
-    .submitSignature({ trainingId: current.id, position: pos, dept: dept, name: name, signature: exportSignature() });
+    .catch(() => { done(); showErr('네트워크 오류가 있어요. 잠시 후 다시 시도해 주세요.'); });
 });
 
 $('nextBtn').onclick = () => {
@@ -302,9 +304,27 @@ $('nextBtn').onclick = () => {
 };
 
 /* ── 시작 ── */
+$('schoolName').textContent = CFG.SCHOOL_NAME || '';
 renderChips();
 $('dept').value = store.get('regDept');
-renderTraining();
+function loadTrainings(){
+  if (!CFG.API_URL || CFG.API_URL.indexOf('여기에') >= 0){
+    $('trainingCard').innerHTML = '<div class="empty"><b>설정이 필요해요</b>config.js 에 Apps Script 주소를 넣어 주세요.</div>';
+    return;
+  }
+  fetch(CFG.API_URL + '?action=list')
+    .then(r => r.json())
+    .then(res => {
+      if (!res.ok) throw new Error(res.message);
+      TRAININGS = res.trainings || [];
+      renderTraining();
+    })
+    .catch(() => {
+      $('trainingCard').innerHTML = '<div class="empty"><b>연수 정보를 불러오지 못했어요</b><button class="ghost" id="retry" style="margin-top:10px">다시 시도</button></div>';
+      $('retry').onclick = () => { $('trainingCard').innerHTML = '<div class="empty">불러오는 중…</div>'; loadTrainings(); };
+    });
+}
+loadTrainings();
 </script>
 </body>
 </html>
