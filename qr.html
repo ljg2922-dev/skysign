@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>연수 등록 QR</title>
+<script src="config.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  body{margin:0;background:#1d3557;color:#fff;font-family:Pretendard,"Malgun Gothic",sans-serif;min-height:100vh}
+  .top{text-align:center;padding:28px 16px 8px}
+  .top .school{opacity:.75;font-size:18px}
+  .top h1{margin:6px 0 0;font-size:34px;font-weight:800;letter-spacing:-.02em}
+  .grid{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;padding:24px}
+  .item{background:#fff;color:#1b1f2a;border-radius:24px;padding:26px 30px;text-align:center;width:min(440px,92vw);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .item h2{margin:0 0 4px;font-size:26px;letter-spacing:-.02em}
+  .item .meta{color:#6b7280;font-size:16px;margin-bottom:14px}
+  .item img{width:100%;max-width:340px;aspect-ratio:1;display:block;margin:0 auto}
+  .item .how{margin-top:14px;font-size:17px;font-weight:700;color:#e9734f}
+  .empty{text-align:center;font-size:22px;padding:80px 20px;opacity:.85;line-height:1.6}
+  .refresh{display:block;margin:0 auto 30px;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:10px;padding:8px 16px;font:inherit;cursor:pointer}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="school" id="school"></div>
+    <h1>교직원 연수 등록</h1>
+  </div>
+  <div id="list"><div class="empty">불러오는 중…</div></div>
+  <button class="refresh" onclick="load()">새로고침</button>
+
+<script>
+const CFG = window.APP_CONFIG || {};
+document.getElementById('school').textContent = CFG.SCHOOL_NAME || '';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// 등록 페이지 주소 = 이 페이지와 같은 폴더의 index.html
+const signUrl = new URL('./', location.href).href;
+
+function load(){
+  const box = document.getElementById('list');
+  box.innerHTML = '<div class="empty">불러오는 중…</div>';
+  fetch(CFG.API_URL + '?action=list')
+    .then(r => r.json())
+    .then(res => {
+      const list = (res && res.trainings) || [];
+      if (!list.length){
+        box.innerHTML = '<div class="empty">진행 중인 연수가 없습니다.<br>시트의 [연수목록]에서 상태를 “진행”으로 바꿔 주세요.</div>';
+        return;
+      }
+      box.innerHTML = '<div class="grid">' + list.map(t => {
+        const link = signUrl + '?t=' + encodeURIComponent(t.id);
+        const qr = 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=8&data=' + encodeURIComponent(link);
+        return '<div class="item"><h2>' + esc(t.name) + '</h2>' +
+          '<div class="meta">' + esc([t.date, t.place].filter(Boolean).join(' · ')) + '</div>' +
+          '<img src="' + esc(qr) + '" alt="등록 QR 코드">' +
+          '<div class="how">📱 카메라로 찍고 서명해 주세요</div></div>';
+      }).join('') + '</div>';
+    })
+    .catch(() => { box.innerHTML = '<div class="empty">불러오지 못했어요. config.js 의 주소를 확인해 주세요.</div>'; });
+}
+load();
+</script>
+</body>
+</html>
