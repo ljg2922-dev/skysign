@@ -24,18 +24,24 @@
   .training .name{font-size:19px;font-weight:800;margin:4px 0 6px;letter-spacing:-.02em}
   .training .meta{font-size:14px;color:var(--sub);line-height:1.5}
   .pick{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-  .pick button{text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;font:inherit;font-size:15px}
+  .pick button{position:relative;padding-right:40px !important;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;font:inherit;font-size:15px}
   .pick button b{display:block;font-size:16px}
   .pick button span{font-size:13px;color:var(--sub)}
-  .pick button.on{border-color:var(--navy);background:#eef3fa}
+  .pick button::after{content:"›";position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:24px;color:var(--navy2)}
+  .pick button:active{border-color:var(--navy);background:#eef3fa}
+  .count{font-size:13px;color:var(--sub);margin-top:2px}
   .link{background:none;border:0;color:var(--navy2);font:inherit;font-size:13px;text-decoration:underline;padding:0;margin-top:8px}
   .field{margin-bottom:18px}
   .field:last-child{margin-bottom:0}
   .field > label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
   .field > label small{font-weight:500;color:var(--sub);margin-left:4px}
-  .chips{display:flex;flex-wrap:wrap;gap:7px}
-  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:inherit;font-size:15px;color:var(--ink)}
-  .chip.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+  .selwrap{position:relative}
+  .selwrap::after{content:"";position:absolute;right:16px;top:50%;width:9px;height:9px;margin-top:-7px;
+    border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(45deg);pointer-events:none}
+  select{width:100%;-webkit-appearance:none;appearance:none;border:1.5px solid var(--line);border-radius:12px;
+    padding:13px 40px 13px 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink);outline:none}
+  select:focus{border-color:var(--navy2)}
+  select.placeholder{color:#9aa3b2}
   input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font:inherit;font-size:16px;background:#fff;outline:none}
   input[type=text]:focus{border-color:var(--navy2)}
   #posEtc{margin-top:8px;display:none}
@@ -81,8 +87,15 @@
 
   <form id="form" class="card" autocomplete="off" style="display:none">
     <div class="field">
-      <label>직위</label>
-      <div class="chips" id="posChips"></div>
+      <label for="posSel">직위</label>
+      <div class="selwrap">
+        <select id="posSel" class="placeholder">
+          <option value="" disabled selected>직위를 선택해 주세요</option>
+          <option>교장</option><option>교감</option><option>교사</option>
+          <option>행정실장</option><option>주무관</option><option>교육공무직</option>
+          <option value="기타">기타 (직접 입력)</option>
+        </select>
+      </div>
       <input type="text" id="posEtc" maxlength="20" placeholder="직위를 입력해 주세요">
     </div>
     <div class="field">
@@ -134,7 +147,7 @@
 const CFG = window.APP_CONFIG || {};
 let TRAININGS = [];
 const PRESELECT = new URLSearchParams(location.search).get('t') || '';
-const POSITIONS = ['교장','교감','수석교사','부장교사','교사','보건교사','영양교사','사서교사','전문상담교사','행정실장','주무관','교육공무직','기타'];
+const POSITIONS = ['교장','교감','교사','행정실장','주무관','교육공무직'];
 
 const $ = (id) => document.getElementById(id);
 const store = {
@@ -145,29 +158,29 @@ const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','
 
 /* ── 연수 선택 ── */
 let current = null;
+let preUsed = false;
 function renderTraining(){
   const card = $('trainingCard');
   if (!TRAININGS.length){
-    card.innerHTML = '<div class="empty"><b>지금 진행 중인 연수가 없어요</b>연수 담당 선생님께 문의해 주세요.</div>';
+    card.innerHTML = '<div class="empty"><b>지금 등록 가능한 연수가 없어요</b>연수 담당 선생님께 문의해 주세요.</div>';
     $('form').style.display = 'none';
     return;
   }
-  const fixed = TRAININGS.find(t => t.id === PRESELECT);
-  if (fixed) current = fixed;
-  else if (TRAININGS.length === 1) current = TRAININGS[0];
+  // QR(?t=)로 들어온 경우 처음 한 번만 그 연수로 바로 입장
+  if (!preUsed){ preUsed = true; current = TRAININGS.find(t => t.id === PRESELECT) || null; }
 
   if (current){
     const meta = [current.date, current.place].filter(Boolean).map(esc).join(' · ');
-    card.innerHTML = '<div class="label">오늘의 연수</div>' +
+    card.innerHTML = '<div class="label">선택한 연수</div>' +
       '<div class="name">' + esc(current.name) + '</div>' +
       '<div class="meta">' + meta + '</div>' +
-      (TRAININGS.length > 1 && !fixed ? '<button class="link" id="changeT">다른 연수 선택</button>' : '');
-    const c = $('changeT');
-    if (c) c.onclick = () => { current = null; renderTraining(); };
+      '<button type="button" class="link" id="changeT">‹ 다른 연수 선택</button>';
+    $('changeT').onclick = () => { current = null; renderTraining(); window.scrollTo({top:0}); };
     $('form').style.display = '';
     requestAnimationFrame(resizePad);
   } else {
-    card.innerHTML = '<div class="label">참여할 연수를 골라 주세요</div><div class="pick">' +
+    card.innerHTML = '<div class="label">참여할 연수를 골라 주세요</div>' +
+      '<div class="count">현재 등록 가능한 연수 ' + TRAININGS.length + '개</div><div class="pick">' +
       TRAININGS.map((t,i) => '<button type="button" data-i="'+i+'"><b>'+esc(t.name)+'</b><span>'+
         esc([t.date,t.place].filter(Boolean).join(' · '))+'</span></button>').join('') + '</div>';
     card.querySelectorAll('.pick button').forEach(b => b.onclick = () => {
@@ -177,22 +190,24 @@ function renderTraining(){
   }
 }
 
-/* ── 직위 칩 ── */
+/* ── 직위 선택 ── */
 let position = '';
-function renderChips(){
+function initPosition(){
+  const sel = $('posSel');
+  sel.onchange = () => selectPos(sel.value, true);
   const saved = store.get('regPos');
-  $('posChips').innerHTML = POSITIONS.map(p => '<button type="button" class="chip" data-p="'+p+'">'+p+'</button>').join('');
-  $('posChips').querySelectorAll('.chip').forEach(b => b.onclick = () => selectPos(b.dataset.p));
   if (saved){
-    if (POSITIONS.includes(saved) && saved !== '기타') selectPos(saved);
+    if (POSITIONS.includes(saved)) selectPos(saved);
     else { selectPos('기타'); $('posEtc').value = saved; }
   }
 }
-function selectPos(p){
+function selectPos(p, focus){
   position = p;
-  $('posChips').querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+  const sel = $('posSel');
+  sel.value = p;
+  sel.classList.toggle('placeholder', !p);
   $('posEtc').style.display = p === '기타' ? 'block' : 'none';
-  if (p === '기타') $('posEtc').focus();
+  if (p === '기타' && focus) $('posEtc').focus();
 }
 
 /* ── 서명 패드 ── */
@@ -273,7 +288,8 @@ $('form').addEventListener('submit', e => {
   const dept = $('dept').value.trim();
   const name = $('name').value.trim();
   if (!current) return showErr('연수를 먼저 선택해 주세요.');
-  if (!pos) return showErr('직위를 선택해 주세요.');
+  if (!position) return showErr('직위를 선택해 주세요.');
+  if (!pos) { $('posEtc').focus(); return showErr('기타 직위를 입력해 주세요.'); }
   if (!dept) { $('dept').focus(); return showErr('소속을 입력해 주세요.'); }
   if (!name) { $('name').focus(); return showErr('성함을 입력해 주세요.'); }
   if (!box || inkLen < 40) return showErr('서명을 조금 더 크게 해 주세요.');
@@ -305,7 +321,7 @@ $('nextBtn').onclick = () => {
 
 /* ── 시작 ── */
 $('schoolName').textContent = CFG.SCHOOL_NAME || '';
-renderChips();
+initPosition();
 $('dept').value = store.get('regDept');
 function loadTrainings(){
   if (!CFG.API_URL || CFG.API_URL.indexOf('여기에') >= 0){
