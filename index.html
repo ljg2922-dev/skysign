@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light only">
 <title>교직원 연수 등록부</title>
 <script src="config.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
@@ -16,50 +17,50 @@
     font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
   .wrap{max-width:520px;margin:0 auto;padding:0 16px 40px}
   header{background:var(--navy);color:#fff;padding:22px 20px 56px;text-align:left}
-  header .school{font-size:13px;opacity:.75;letter-spacing:.02em}
-  header h1{margin:4px 0 0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+  header .school{font-size:15px;opacity:.75;letter-spacing:.02em}
+  header h1{margin:4px 0 0;font-size:26px;font-weight:800;letter-spacing:-.02em}
   .card{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(20,30,60,.06);margin-top:14px}
   .training{margin-top:-40px}
-  .training .label{font-size:12px;color:var(--accent);font-weight:700}
-  .training .name{font-size:19px;font-weight:800;margin:4px 0 6px;letter-spacing:-.02em}
-  .training .meta{font-size:14px;color:var(--sub);line-height:1.5}
+  .training .label{font-size:14px;color:var(--accent);font-weight:700}
+  .training .name{font-size:23px;font-weight:800;margin:4px 0 6px;letter-spacing:-.02em}
+  .training .meta{font-size:16px;color:var(--sub);line-height:1.5}
   .pick{display:flex;flex-direction:column;gap:8px;margin-top:10px}
-  .pick button{position:relative;padding-right:40px !important;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;font:inherit;font-size:15px}
-  .pick button b{display:block;font-size:16px}
-  .pick button span{font-size:13px;color:var(--sub)}
+  .pick button{position:relative;padding-right:40px !important;text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:15px 16px;font:inherit;font-size:17px}
+  .pick button b{display:block;font-size:19px;margin-bottom:2px}
+  .pick button span{font-size:15px;color:var(--sub)}
   .pick button::after{content:"›";position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:24px;color:var(--navy2)}
   .pick button:active{border-color:var(--navy);background:#eef3fa}
-  .count{font-size:13px;color:var(--sub);margin-top:2px}
-  .link{background:none;border:0;color:var(--navy2);font:inherit;font-size:13px;text-decoration:underline;padding:0;margin-top:8px}
+  .count{font-size:15px;color:var(--sub);margin-top:2px}
+  .link{background:none;border:0;color:var(--navy2);font:inherit;font-size:13px;text-decoration:underline;padding:0;margin-top:10px;font-size:15px}
   .field{margin-bottom:18px}
   .field:last-child{margin-bottom:0}
-  .field > label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
-  .field > label small{font-weight:500;color:var(--sub);margin-left:4px}
+  .field > label{display:block;font-size:17px;font-weight:700;margin-bottom:8px}
+  .field > label small{font-size:15px;font-weight:500;color:var(--sub);margin-left:4px}
   .selwrap{position:relative}
   .selwrap::after{content:"";position:absolute;right:16px;top:50%;width:9px;height:9px;margin-top:-7px;
     border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(45deg);pointer-events:none}
   select{width:100%;-webkit-appearance:none;appearance:none;border:1.5px solid var(--line);border-radius:12px;
-    padding:13px 40px 13px 14px;font:inherit;font-size:16px;background:#fff;color:var(--ink);outline:none}
+    padding:15px 42px 15px 15px;font:inherit;font-size:18px;background:#fff;color:var(--ink);outline:none}
   select:focus{border-color:var(--navy2)}
   select.placeholder{color:#9aa3b2}
-  input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font:inherit;font-size:16px;background:#fff;outline:none}
+  input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:15px;font:inherit;font-size:18px;background:#fff;outline:none}
   input[type=text]:focus{border-color:var(--navy2)}
   #posEtc{margin-top:8px;display:none}
   .sigbox{position:relative;border:1.5px dashed #b8c2d3;border-radius:14px;background:#fafbfd;overflow:hidden}
   .sigbox.inked{border-style:solid;border-color:var(--navy2);background:#fff}
   #pad{display:block;width:100%;height:210px;touch-action:none;cursor:crosshair}
   .sigbox .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-    color:#a3adbf;font-size:16px;pointer-events:none}
+    color:#a3adbf;font-size:18px;pointer-events:none}
   .sigbox .baseline{position:absolute;left:18px;right:18px;bottom:46px;border-bottom:1px solid #e1e6ee;pointer-events:none}
   .sigbox.inked .hint{display:none}
-  .sigtools{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;color:var(--sub)}
-  .ghost{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font:inherit;font-size:14px;color:var(--ink)}
-  .submit{width:100%;margin-top:18px;border:0;border-radius:14px;padding:17px;font:inherit;font-size:17px;font-weight:800;
+  .sigtools{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:15px;color:var(--sub)}
+  .ghost{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:9px 16px;font:inherit;font-size:16px;color:var(--ink)}
+  .submit{width:100%;margin-top:18px;border:0;border-radius:14px;padding:18px;font:inherit;font-size:20px;font-weight:800;
     background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(233,115,79,.3)}
   .submit:disabled{background:#c9ced8;box-shadow:none}
-  .err{color:var(--err);font-size:14px;margin-top:10px;min-height:1em;text-align:center}
-  .empty{text-align:center;padding:36px 18px;color:var(--sub);line-height:1.6}
-  .empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+  .err{color:var(--err);font-size:16px;margin-top:10px;min-height:1em;text-align:center}
+  .empty{text-align:center;padding:36px 18px;color:var(--sub);line-height:1.6;font-size:16px}
+  .empty b{display:block;color:var(--ink);font-size:19px;margin-bottom:4px}
   /* 완료 화면 */
   .done{position:fixed;inset:0;background:rgba(243,245,249,.98);display:none;align-items:center;justify-content:center;padding:24px;z-index:10}
   .done.show{display:flex}
@@ -67,10 +68,10 @@
   .check{width:84px;height:84px;border-radius:50%;background:var(--ok);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
     animation:pop .35s ease-out}
   @keyframes pop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
-  .done h2{margin:0 0 8px;font-size:23px}
-  .done p{margin:0;color:var(--sub);line-height:1.6;font-size:15px}
-  .done .no{display:inline-block;margin:16px 0 22px;background:#fff;border-radius:12px;padding:10px 18px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-  .done button{width:100%;border:0;border-radius:14px;padding:15px;font:inherit;font-size:16px;font-weight:700;background:var(--navy);color:#fff}
+  .done h2{margin:0 0 8px;font-size:27px}
+  .done p{margin:0;color:var(--sub);line-height:1.6;font-size:17px}
+  .done .no{display:inline-block;font-size:17px;margin:16px 0 22px;background:#fff;border-radius:12px;padding:10px 18px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .done button{width:100%;border:0;border-radius:14px;padding:17px;font:inherit;font-size:18px;font-weight:700;background:var(--navy);color:#fff}
   .spin{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;
     animation:sp 0.8s linear infinite;vertical-align:-3px;margin-right:6px}
   @keyframes sp{to{transform:rotate(360deg)}}
@@ -87,24 +88,24 @@
 
   <form id="form" class="card" autocomplete="off" style="display:none">
     <div class="field">
-      <label for="posSel">직위</label>
+      <label for="dept">소속 <small>예: 3학년 1반, 교무부, 행정실</small></label>
+      <input type="text" id="dept" maxlength="30" placeholder="예: 3학년 1반">
+    </div>
+    <div class="field">
+      <label for="posSel">직위(급)</label>
       <div class="selwrap">
         <select id="posSel" class="placeholder">
-          <option value="" disabled selected>직위를 선택해 주세요</option>
+          <option value="" disabled selected>직위(급)를 선택해 주세요</option>
           <option>교장</option><option>교감</option><option>교사</option>
           <option>행정실장</option><option>주무관</option><option>교육공무직</option>
           <option value="기타">기타 (직접 입력)</option>
         </select>
       </div>
-      <input type="text" id="posEtc" maxlength="20" placeholder="직위를 입력해 주세요">
+      <input type="text" id="posEtc" maxlength="20" placeholder="직위(급)를 입력해 주세요">
     </div>
     <div class="field">
-      <label for="dept">소속 <small>예: 3학년 1반, 교무부, 행정실</small></label>
-      <input type="text" id="dept" maxlength="30" placeholder="예: 3학년 1반">
-    </div>
-    <div class="field">
-      <label for="name">성함</label>
-      <input type="text" id="name" maxlength="20" placeholder="성함">
+      <label for="name">성명</label>
+      <input type="text" id="name" maxlength="20" placeholder="성명">
     </div>
     <div class="field">
       <label>서명</label>
@@ -280,10 +281,10 @@ $('form').addEventListener('submit', e => {
   const dept = $('dept').value.trim();
   const name = $('name').value.trim();
   if (!current) return showErr('연수를 먼저 선택해 주세요.');
-  if (!position) return showErr('직위를 선택해 주세요.');
-  if (!pos) { $('posEtc').focus(); return showErr('기타 직위를 입력해 주세요.'); }
   if (!dept) { $('dept').focus(); return showErr('소속을 입력해 주세요.'); }
-  if (!name) { $('name').focus(); return showErr('성함을 입력해 주세요.'); }
+  if (!position) return showErr('직위(급)를 선택해 주세요.');
+  if (!pos) { $('posEtc').focus(); return showErr('직위(급)를 입력해 주세요.'); }
+  if (!name) { $('name').focus(); return showErr('성명을 입력해 주세요.'); }
   if (!box || inkLen < 40) return showErr('서명을 조금 더 크게 해 주세요.');
 
   const btn = $('submitBtn');
