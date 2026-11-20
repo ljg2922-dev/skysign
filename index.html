@@ -99,11 +99,9 @@
       <input type="text" id="posEtc" maxlength="20" placeholder="직위를 입력해 주세요">
     </div>
     <div class="field">
-      <label for="dept">소속 <small>예: 3학년, 교무부, 행정실</small></label>
-      <input type="text" id="dept" list="deptList" maxlength="30" placeholder="소속">
+      <label for="dept">소속 <small>예: 3학년 1반, 교무부, 행정실</small></label>
+      <input type="text" id="dept" list="deptList" maxlength="30" placeholder="예: 3학년 1반">
       <datalist id="deptList">
-        <option>1학년</option><option>2학년</option><option>3학년</option>
-        <option>4학년</option><option>5학년</option><option>6학년</option>
         <option>교무부</option><option>연구부</option><option>생활안전부</option>
         <option>방과후부</option><option>특수학급</option><option>교과전담</option>
         <option>보건실</option><option>도서실</option><option>상담실</option>
@@ -322,6 +320,17 @@ $('nextBtn').onclick = () => {
 /* ── 시작 ── */
 $('schoolName').textContent = CFG.SCHOOL_NAME || '';
 initPosition();
+// 소속 자동완성: 학년·반 목록 (1~5학년 9반, 6학년 8반)
+(function(){
+  const CLASSES = {1:9, 2:9, 3:9, 4:9, 5:9, 6:8};
+  const dl = $('deptList'), frag = document.createDocumentFragment();
+  Object.keys(CLASSES).forEach(g => {
+    for (let c = 1; c <= CLASSES[g]; c++){
+      const o = document.createElement('option'); o.value = g + '학년 ' + c + '반'; frag.appendChild(o);
+    }
+  });
+  dl.insertBefore(frag, dl.firstChild);
+})();
 $('dept').value = store.get('regDept');
 function loadTrainings(){
   if (!CFG.API_URL || CFG.API_URL.indexOf('여기에') >= 0){
