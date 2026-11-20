@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  body{margin:0;background:#1d3557;color:#fff;font-family:Pretendard,"Malgun Gothic",sans-serif;min-height:100vh}
+  .top{text-align:center;padding:28px 16px 8px}
+  .top .school{opacity:.75;font-size:18px}
+  .top h1{margin:6px 0 0;font-size:34px;font-weight:800;letter-spacing:-.02em}
+  .grid{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;padding:24px}
+  .item{background:#fff;color:#1b1f2a;border-radius:24px;padding:26px 30px;text-align:center;width:min(440px,92vw);box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .item h2{margin:0 0 4px;font-size:26px;letter-spacing:-.02em}
+  .item .meta{color:#6b7280;font-size:16px;margin-bottom:14px}
+  .item img{width:100%;max-width:340px;aspect-ratio:1;display:block;margin:0 auto}
+  .item .how{margin-top:14px;font-size:17px;font-weight:700;color:#e9734f}
+  .empty{text-align:center;font-size:22px;padding:80px 20px;opacity:.85}
+</style>
+</head>
+<body>
+  <div class="top">
+    <div class="school"><?= school ?></div>
+    <h1>교직원 연수 등록</h1>
+  </div>
+  <? if (!trainings.length) { ?>
+    <div class="empty">진행 중인 연수가 없습니다.<br>시트의 [연수목록]에서 상태를 “진행”으로 바꿔 주세요.</div>
+  <? } else { ?>
+    <div class="grid">
+    <? for (var i = 0; i < trainings.length; i++) {
+         var t = trainings[i];
+         var link = appUrl + '?t=' + encodeURIComponent(t.id);
+         var qr = 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&margin=8&data=' + encodeURIComponent(link); ?>
+      <div class="item">
+        <h2><?= t.name ?></h2>
+        <div class="meta"><?= [t.date, t.place].filter(String).join(' · ') ?></div>
+        <img src="<?= qr ?>" alt="등록 QR 코드">
+        <div class="how">📱 카메라로 찍고 서명해 주세요</div>
+      </div>
+    <? } ?>
+    </div>
+  <? } ?>
+</body>
+</html>

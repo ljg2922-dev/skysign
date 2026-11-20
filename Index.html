@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root{
+    --navy:#1d3557; --navy2:#2b4a75; --ink:#1b1f2a; --sub:#6b7280; --line:#e3e7ee;
+    --bg:#f3f5f9; --card:#fff; --accent:#e9734f; --ok:#2a9d8f; --err:#d64545;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:Pretendard,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px 40px}
+  header{background:var(--navy);color:#fff;padding:22px 20px 56px;text-align:left}
+  header .school{font-size:13px;opacity:.75;letter-spacing:.02em}
+  header h1{margin:4px 0 0;font-size:22px;font-weight:800;letter-spacing:-.02em}
+  .card{background:var(--card);border-radius:16px;padding:18px;box-shadow:0 2px 10px rgba(20,30,60,.06);margin-top:14px}
+  .training{margin-top:-40px}
+  .training .label{font-size:12px;color:var(--accent);font-weight:700}
+  .training .name{font-size:19px;font-weight:800;margin:4px 0 6px;letter-spacing:-.02em}
+  .training .meta{font-size:14px;color:var(--sub);line-height:1.5}
+  .pick{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .pick button{text-align:left;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px 14px;font:inherit;font-size:15px}
+  .pick button b{display:block;font-size:16px}
+  .pick button span{font-size:13px;color:var(--sub)}
+  .pick button.on{border-color:var(--navy);background:#eef3fa}
+  .link{background:none;border:0;color:var(--navy2);font:inherit;font-size:13px;text-decoration:underline;padding:0;margin-top:8px}
+  .field{margin-bottom:18px}
+  .field:last-child{margin-bottom:0}
+  .field > label{display:block;font-size:14px;font-weight:700;margin-bottom:8px}
+  .field > label small{font-weight:500;color:var(--sub);margin-left:4px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:9px 14px;font:inherit;font-size:15px;color:var(--ink)}
+  .chip.on{background:var(--navy);border-color:var(--navy);color:#fff;font-weight:700}
+  input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;font:inherit;font-size:16px;background:#fff;outline:none}
+  input[type=text]:focus{border-color:var(--navy2)}
+  #posEtc{margin-top:8px;display:none}
+  .sigbox{position:relative;border:1.5px dashed #b8c2d3;border-radius:14px;background:#fafbfd;overflow:hidden}
+  .sigbox.inked{border-style:solid;border-color:var(--navy2);background:#fff}
+  #pad{display:block;width:100%;height:210px;touch-action:none;cursor:crosshair}
+  .sigbox .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:#a3adbf;font-size:16px;pointer-events:none}
+  .sigbox .baseline{position:absolute;left:18px;right:18px;bottom:46px;border-bottom:1px solid #e1e6ee;pointer-events:none}
+  .sigbox.inked .hint{display:none}
+  .sigtools{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:13px;color:var(--sub)}
+  .ghost{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:7px 12px;font:inherit;font-size:14px;color:var(--ink)}
+  .submit{width:100%;margin-top:18px;border:0;border-radius:14px;padding:17px;font:inherit;font-size:17px;font-weight:800;
+    background:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(233,115,79,.3)}
+  .submit:disabled{background:#c9ced8;box-shadow:none}
+  .err{color:var(--err);font-size:14px;margin-top:10px;min-height:1em;text-align:center}
+  .empty{text-align:center;padding:36px 18px;color:var(--sub);line-height:1.6}
+  .empty b{display:block;color:var(--ink);font-size:17px;margin-bottom:4px}
+  /* 완료 화면 */
+  .done{position:fixed;inset:0;background:rgba(243,245,249,.98);display:none;align-items:center;justify-content:center;padding:24px;z-index:10}
+  .done.show{display:flex}
+  .done .box{text-align:center;max-width:360px}
+  .check{width:84px;height:84px;border-radius:50%;background:var(--ok);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;
+    animation:pop .35s ease-out}
+  @keyframes pop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+  .done h2{margin:0 0 8px;font-size:23px}
+  .done p{margin:0;color:var(--sub);line-height:1.6;font-size:15px}
+  .done .no{display:inline-block;margin:16px 0 22px;background:#fff;border-radius:12px;padding:10px 18px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.05)}
+  .done button{width:100%;border:0;border-radius:14px;padding:15px;font:inherit;font-size:16px;font-weight:700;background:var(--navy);color:#fff}
+  .spin{display:inline-block;width:16px;height:16px;border:2.5px solid rgba(255,255,255,.5);border-top-color:#fff;border-radius:50%;
+    animation:sp 0.8s linear infinite;vertical-align:-3px;margin-right:6px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body data-pre="<?= preselect ?>">
+<header>
+  <div class="school"><?= school ?></div>
+  <h1>교직원 연수 등록부</h1>
+</header>
+
+<div class="wrap">
+  <div class="card training" id="trainingCard"></div>
+
+  <form id="form" class="card" autocomplete="off" style="display:none">
+    <div class="field">
+      <label>직위</label>
+      <div class="chips" id="posChips"></div>
+      <input type="text" id="posEtc" maxlength="20" placeholder="직위를 입력해 주세요">
+    </div>
+    <div class="field">
+      <label for="dept">소속 <small>예: 3학년, 교무부, 행정실</small></label>
+      <input type="text" id="dept" list="deptList" maxlength="30" placeholder="소속">
+      <datalist id="deptList">
+        <option>1학년</option><option>2학년</option><option>3학년</option>
+        <option>4학년</option><option>5학년</option><option>6학년</option>
+        <option>교무부</option><option>연구부</option><option>생활안전부</option>
+        <option>방과후부</option><option>특수학급</option><option>교과전담</option>
+        <option>보건실</option><option>도서실</option><option>상담실</option>
+        <option>행정실</option><option>급식실</option><option>돌봄교실</option>
+      </datalist>
+    </div>
+    <div class="field">
+      <label for="name">성함</label>
+      <input type="text" id="name" maxlength="20" placeholder="성함">
+    </div>
+    <div class="field">
+      <label>서명</label>
+      <div class="sigbox" id="sigbox">
+        <canvas id="pad"></canvas>
+        <div class="baseline"></div>
+        <div class="hint">✍️ 여기에 손가락으로 서명해 주세요</div>
+      </div>
+      <div class="sigtools">
+        <span>칸 안에 크게 써 주세요</span>
+        <button type="button" class="ghost" id="clearBtn">지우기</button>
+      </div>
+    </div>
+    <button type="submit" class="submit" id="submitBtn">등록하기</button>
+    <div class="err" id="err"></div>
+  </form>
+</div>
+
+<div class="done" id="done">
+  <div class="box">
+    <div class="check">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+    </div>
+    <h2>등록 완료!</h2>
+    <p id="doneMsg"></p>
+    <div class="no" id="doneNo"></div>
+    <button type="button" id="nextBtn">다음 분 등록하기</button>
+  </div>
+</div>
+
+<script>
+const TRAININGS = <?!= trainingsJson ?>;
+const PRESELECT = document.body.dataset.pre || '';
+const POSITIONS = ['교장','교감','수석교사','부장교사','교사','보건교사','영양교사','사서교사','전문상담교사','행정실장','주무관','교육공무직','기타'];
+
+const $ = (id) => document.getElementById(id);
+const store = {
+  get(k){ try{ return localStorage.getItem(k) || ''; }catch(e){ return ''; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+};
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ── 연수 선택 ── */
+let current = null;
+function renderTraining(){
+  const card = $('trainingCard');
+  if (!TRAININGS.length){
+    card.innerHTML = '<div class="empty"><b>지금 진행 중인 연수가 없어요</b>연수 담당 선생님께 문의해 주세요.</div>';
+    $('form').style.display = 'none';
+    return;
+  }
+  const fixed = TRAININGS.find(t => t.id === PRESELECT);
+  if (fixed) current = fixed;
+  else if (TRAININGS.length === 1) current = TRAININGS[0];
+
+  if (current){
+    const meta = [current.date, current.place].filter(Boolean).map(esc).join(' · ');
+    card.innerHTML = '<div class="label">오늘의 연수</div>' +
+      '<div class="name">' + esc(current.name) + '</div>' +
+      '<div class="meta">' + meta + '</div>' +
+      (TRAININGS.length > 1 && !fixed ? '<button class="link" id="changeT">다른 연수 선택</button>' : '');
+    const c = $('changeT');
+    if (c) c.onclick = () => { current = null; renderTraining(); };
+    $('form').style.display = '';
+    requestAnimationFrame(resizePad);
+  } else {
+    card.innerHTML = '<div class="label">참여할 연수를 골라 주세요</div><div class="pick">' +
+      TRAININGS.map((t,i) => '<button type="button" data-i="'+i+'"><b>'+esc(t.name)+'</b><span>'+
+        esc([t.date,t.place].filter(Boolean).join(' · '))+'</span></button>').join('') + '</div>';
+    card.querySelectorAll('.pick button').forEach(b => b.onclick = () => {
+      current = TRAININGS[+b.dataset.i]; renderTraining();
+    });
+    $('form').style.display = 'none';
+  }
+}
+
+/* ── 직위 칩 ── */
+let position = '';
+function renderChips(){
+  const saved = store.get('regPos');
+  $('posChips').innerHTML = POSITIONS.map(p => '<button type="button" class="chip" data-p="'+p+'">'+p+'</button>').join('');
+  $('posChips').querySelectorAll('.chip').forEach(b => b.onclick = () => selectPos(b.dataset.p));
+  if (saved){
+    if (POSITIONS.includes(saved) && saved !== '기타') selectPos(saved);
+    else { selectPos('기타'); $('posEtc').value = saved; }
+  }
+}
+function selectPos(p){
+  position = p;
+  $('posChips').querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.p === p));
+  $('posEtc').style.display = p === '기타' ? 'block' : 'none';
+  if (p === '기타') $('posEtc').focus();
+}
+
+/* ── 서명 패드 ── */
+const pad = $('pad'), ctx = pad.getContext('2d');
+let drawing = false, last = null, lastMid = null, inkLen = 0, padW = 0;
+let box = null; // 잉크 영역 {x1,y1,x2,y2}
+
+function resizePad(){
+  const r = pad.getBoundingClientRect();
+  if (!r.width || Math.round(r.width) === padW) return;
+  padW = Math.round(r.width);
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  pad.width = Math.round(r.width * dpr);
+  pad.height = Math.round(r.height * dpr);
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#111'; ctx.fillStyle = '#111'; ctx.lineWidth = 2.8;
+  clearPad();
+}
+function clearPad(){
+  ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.clearRect(0,0,pad.width,pad.height); ctx.restore();
+  inkLen = 0; box = null;
+  $('sigbox').classList.remove('inked');
+}
+function pt(e){ const r = pad.getBoundingClientRect(); return {x:e.clientX - r.left, y:e.clientY - r.top}; }
+function grow(p){
+  if (!box) box = {x1:p.x,y1:p.y,x2:p.x,y2:p.y};
+  else { box.x1=Math.min(box.x1,p.x); box.y1=Math.min(box.y1,p.y); box.x2=Math.max(box.x2,p.x); box.y2=Math.max(box.y2,p.y); }
+}
+pad.addEventListener('pointerdown', e => {
+  e.preventDefault();
+  try { pad.setPointerCapture(e.pointerId); } catch(_) {}
+  drawing = true; last = lastMid = pt(e); grow(last);
+  ctx.beginPath(); ctx.arc(last.x, last.y, 1.4, 0, Math.PI*2); ctx.fill();
+  $('sigbox').classList.add('inked');
+});
+pad.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  e.preventDefault();
+  const evs = e.getCoalescedEvents ? e.getCoalescedEvents() : [e];
+  for (const ev of (evs.length ? evs : [e])){
+    const p = pt(ev);
+    const mid = {x:(last.x+p.x)/2, y:(last.y+p.y)/2};
+    ctx.beginPath(); ctx.moveTo(lastMid.x, lastMid.y);
+    ctx.quadraticCurveTo(last.x, last.y, mid.x, mid.y); ctx.stroke();
+    inkLen += Math.hypot(p.x-last.x, p.y-last.y);
+    grow(p); last = p; lastMid = mid;
+  }
+});
+['pointerup','pointercancel','pointerleave'].forEach(t => pad.addEventListener(t, () => { drawing = false; }));
+$('clearBtn').onclick = clearPad;
+window.addEventListener('resize', resizePad);
+
+/** 서명 부분만 잘라 흰 배경 PNG로 */
+function exportSignature(){
+  const r = pad.getBoundingClientRect();
+  const dpr = pad.width / r.width;
+  const m = 12;
+  const x1 = Math.max(0, box.x1 - m), y1 = Math.max(0, box.y1 - m);
+  const x2 = Math.min(r.width, box.x2 + m), y2 = Math.min(r.height, box.y2 + m);
+  const sw = (x2-x1)*dpr, sh = (y2-y1)*dpr;
+  const scale = Math.min(1, 600/sw, 240/sh);
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(sw*scale));
+  out.height = Math.max(1, Math.round(sh*scale));
+  const o = out.getContext('2d');
+  o.fillStyle = '#fff'; o.fillRect(0,0,out.width,out.height);
+  o.drawImage(pad, x1*dpr, y1*dpr, sw, sh, 0, 0, out.width, out.height);
+  return out.toDataURL('image/png');
+}
+
+/* ── 제출 ── */
+function showErr(msg){ $('err').textContent = msg || ''; }
+$('form').addEventListener('submit', e => {
+  e.preventDefault();
+  showErr('');
+  const pos = position === '기타' ? $('posEtc').value.trim() : position;
+  const dept = $('dept').value.trim();
+  const name = $('name').value.trim();
+  if (!current) return showErr('연수를 먼저 선택해 주세요.');
+  if (!pos) return showErr('직위를 선택해 주세요.');
+  if (!dept) { $('dept').focus(); return showErr('소속을 입력해 주세요.'); }
+  if (!name) { $('name').focus(); return showErr('성함을 입력해 주세요.'); }
+  if (!box || inkLen < 40) return showErr('서명을 조금 더 크게 해 주세요.');
+
+  const btn = $('submitBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span>등록 중…';
+  const done = () => { btn.disabled = false; btn.textContent = '등록하기'; };
+
+  google.script.run
+    .withSuccessHandler(res => {
+      done();
+      if (!res || !res.ok){ showErr((res && res.message) || '등록하지 못했어요.'); return; }
+      store.set('regPos', pos); store.set('regDept', dept);
+      $('doneMsg').innerHTML = '<b>' + esc(res.name) + '</b> 님, 「' + esc(res.training) + '」<br>연수 등록이 완료되었습니다.';
+      $('doneNo').textContent = '연번 ' + res.no + '번 · ' + res.time;
+      $('done').classList.add('show');
+    })
+    .withFailureHandler(err => {
+      done();
+      showErr((err && err.message) ? err.message.replace(/^Error:\s*/,'') : '네트워크 오류가 있어요. 다시 시도해 주세요.');
+    })
+    .submitSignature({ trainingId: current.id, position: pos, dept: dept, name: name, signature: exportSignature() });
+});
+
+$('nextBtn').onclick = () => {
+  $('done').classList.remove('show');
+  $('name').value = ''; clearPad(); showErr('');
+  window.scrollTo({top:0, behavior:'smooth'});
+};
+
+/* ── 시작 ── */
+renderChips();
+$('dept').value = store.get('regDept');
+renderTraining();
+</script>
+</body>
+</html>
